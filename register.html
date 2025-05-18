@@ -1,0 +1,117 @@
+<?php session_start(); ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MEOWIÉ</title>
+    <link rel="stylesheet" href="style_register.css">
+</head>
+<body>
+    <div class="wrapper">
+        <P class="meowie">MEOWIÉ</P>        
+        <h1>Register</h1>
+        <form id="registerForm" action="register_process.php" method="post">
+            <div class="input-field">
+              <input type="email" id="username" name="username" required placeholder=" ">
+              <label for="username">Email</label>
+            </div>
+            <div class="input-field">
+              <div class="password-container">
+                <input type="password" id="password" name="password" required placeholder=" ">
+                <label for="password">Password</label>
+                <span class="toggle-password" data-target="password"></span>
+              </div>
+              <small id="passwordError">Password must be at least 8 characters, include uppercase, number & symbol.</small>
+            </div>
+            <div class="input-field">
+              <div class="password-container">
+                <input type="password" id="confirm_password" name="confirm_password" required placeholder=" ">
+                <label for="confirm_password">Confirm Password</label>
+                <span class="toggle-password" data-target="confirm_password"></span>
+              </div>
+              <small id="confirmPasswordError">Passwords do not match.</small>
+            </div>
+            <button type="submit">Register</button>
+          </form>
+        <p>Already have an account? <a href="login.php">Login here</a></p>
+    </div>
+    <script>
+        // Handle show/hide password for both fields
+        document.querySelectorAll('.toggle-password').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                this.classList.toggle('active');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                } else {
+                    passwordInput.type = 'password';
+                }
+            });
+        });
+
+        // Enhanced real-time validation script
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            let isValid = true;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+    
+            // Reset errors
+            document.querySelectorAll('small[id$="Error"]').forEach(e => e.style.display = 'none');
+            document.querySelectorAll('.input-field').forEach(e => e.classList.remove('error'));
+    
+            // Check email
+            if (!username) {
+                showError('username', 'Please enter your email');
+                isValid = false;
+            } else if (!validateEmail(username)) {
+                showError('username', 'Invalid email format');
+                isValid = false;
+            }
+    
+            // Check password
+            if (!password) {
+                showError('password', 'Please enter your password');
+                isValid = false;
+            } else if (!validatePassword(password)) {
+                showError('password', 'Password must be ≥8 characters with uppercase, numbers, and special characters');
+                isValid = false;
+            }
+    
+            // Check password confirmation
+            if (!confirmPassword) {
+                showError('confirm_password', 'Please confirm your password');
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                showError('confirm_password', 'Passwords do not match');
+                isValid = false;
+            }
+    
+            if (!isValid) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        });
+    
+        function validateEmail(email) {
+            const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(String(email).toLowerCase());
+        }
+    
+        function validatePassword(password) {
+            return /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+        }
+    
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId).closest('.input-field');
+            const errorElement = document.getElementById(`${fieldId}Error`);
+            field.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
